@@ -1,0 +1,7 @@
+#2.1 — Se placer dans le répertoire Redmine
+cd /opt/redmine
+#2.2 — Définir un mot de passe sécurisé pour PostgreSQL
+# Générer un mot de passe aléatoire pour PostgreSQL
+POSTGRES_PASS=$(openssl rand -base64 24)
+echo "Mot de passe PostgreSQL : $POSTGRES_PASS"
+# NOTE CE MOT DE PASSE !
