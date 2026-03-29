@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+
+  # ─────────────────────────────────────────────────────────
+  # SERVICE VAULTWARDEN
+  # Le serveur de gestion de mots de passe
+  # ─────────────────────────────────────────────────────────
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+
+    # Volumes : où stocker les données sur le disque de la VM
+    volumes:
+      - ./data:/data
+
+    # Variables d'environnement : configuration de Vaultwarden
+    environment:
+      # Domaine public de Vaultwarden (HTTPS obligatoire pour les clients Bitwarden)
+      - DOMAIN=https://172.20.100.52
+
+      # Token d'administration (remplace par TON token généré)
+      - ADMIN_TOKEN=REMPLACE_PAR_TON_TOKEN_ICI
+
+      # Permettre l'inscription de nouveaux comptes
+      # true = tout le monde peut s'inscrire (pour le lab)
+      # false = seul l'admin peut créer des comptes (production)
+      - SIGNUPS_ALLOWED=true
+
+      # Invitations par email (désactivé si pas de serveur mail configuré)
+      - INVITATIONS_ALLOWED=false
+
+      # Port interne sur lequel Vaultwarden écoute
+      - ROCKET_PORT=8080
+
+      # Logs
+      - LOG_LEVEL=warn
+      - EXTENDED_LOGGING=true
+
+      # Websocket pour les notifications en temps réel
+      - WEBSOCKET_ENABLED=true
+
+    # Ports : on n'expose PAS directement Vaultwarden sur internet
+    # Nginx va servir de relais (reverse proxy)
+    # On expose uniquement en local pour Nginx
+    ports:
+      - "127.0.0.1:8080:8080"    # HTTP Vaultwarden (accessible uniquement depuis localhost)
+      - "127.0.0.1:3012:3012"    # WebSocket (notifications temps réel)
+
+  # ─────────────────────────────────────────────────────────
+  # SERVICE NGINX
+  # Reverse proxy qui gère le HTTPS
+  # ─────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: vaultwarden-nginx
+    restart: unless-stopped
+    depends_on:
+      - vaultwarden
+
+    ports:
+      - "80:80"      # HTTP → redirection vers HTTPS
+      - "443:443"    # HTTPS → Vaultwarden
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+
+volumes: {}
