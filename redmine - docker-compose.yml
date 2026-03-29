@@ -1,0 +1,73 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REDMINE + POSTGRESQL — Docker Compose
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # BASE DE DONNÉES PostgreSQL
+  # Stocke toutes les données Redmine
+  # ───────────────────────────────────────────────────────────────────────────
+  postgresql:
+    image: postgres:15-alpine
+    container_name: redmine-postgresql
+    restart: unless-stopped
+
+    # Variables de configuration PostgreSQL
+    environment:
+      POSTGRES_DB: redmine_production        # Nom de la base de données
+      POSTGRES_USER: redmine                 # Utilisateur de la BDD
+      POSTGRES_PASSWORD: REMPLACE_PAR_TON_MOT_DE_PASSE_POSTGRES  # ← CHANGE ÇA !
+
+    # Stockage persistant des données
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+
+    # Vérification de santé : Redmine attend que PostgreSQL soit prêt
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redmine -d redmine_production"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    # PostgreSQL n'est PAS accessible depuis l'extérieur (pas de ports: exposés)
+    # Il communique uniquement avec Redmine via le réseau Docker interne
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # APPLICATION REDMINE
+  # Le serveur de gestion de projet
+  # ───────────────────────────────────────────────────────────────────────────
+  redmine:
+    image: redmine:5.1-alpine
+    container_name: redmine
+    restart: unless-stopped
+    depends_on:
+      postgresql:
+        condition: service_healthy   # Attend que PostgreSQL soit prêt avant de démarrer
+
+    # Port : Redmine est accessible sur le port 3000 de la VM
+    ports:
+      - "3000:3000"
+
+    # Variables de configuration Redmine
+    environment:
+      # Connexion à PostgreSQL
+      REDMINE_DB_POSTGRES: postgresql         # Nom du service Docker PostgreSQL
+      REDMINE_DB_PORT: 5432
+      REDMINE_DB_DATABASE: redmine_production
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: REMPLACE_PAR_TON_MOT_DE_PASSE_POSTGRES  # ← MÊME MOT DE PASSE !
+
+      # Clé secrète pour les sessions (générée aléatoirement)
+      REDMINE_SECRET_KEY_BASE: REMPLACE_PAR_UNE_CLE_SECRETE_LONGUE  # ← CHANGE ÇA !
+
+    # Stockage persistant des fichiers Redmine
+    volumes:
+      - ./data/redmine:/usr/src/redmine/files   # Pièces jointes des tickets
+      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:ro
+
+networks:
+  default:
+    name: redmine-network
