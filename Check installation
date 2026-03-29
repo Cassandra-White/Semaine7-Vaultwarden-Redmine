@@ -1,0 +1,28 @@
+# Script de vérification
+echo "=== Vérification pré-installation Vaultwarden ==="
+
+# Hostname
+echo -n "Hostname : "
+hostname -f
+
+# IP
+echo -n "IP : "
+ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}'
+
+# Docker
+echo -n "Docker : "
+docker --version 2>/dev/null && echo "✅" || echo "❌ Non installé"
+
+# Docker Compose
+echo -n "Docker Compose : "
+docker compose version 2>/dev/null && echo "✅" || echo "❌ Non installé"
+
+# Espace disque
+echo -n "Espace disque libre : "
+df -h / | awk 'NR==2 {print $4}'
+
+# RAM disponible
+echo -n "RAM disponible : "
+free -h | awk 'NR==2 {print $7}'
+
+echo "=== Vérification terminée ==="
