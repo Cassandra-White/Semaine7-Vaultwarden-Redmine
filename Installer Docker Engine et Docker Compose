@@ -1,0 +1,21 @@
+apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+# Vérifier que Docker est actif
+systemctl status docker
+# Doit afficher : Active: active (running)
+
+# Vérifier la version installée
+docker --version
+# Exemple : Docker version 25.0.x, build xxxxxxx
+
+# Vérifier Docker Compose
+docker compose version
+# Exemple : Docker Compose version v2.x.x
+
+# Lancer un container de test (télécharge une mini-image et affiche "Hello from Docker!")
+docker run --rm hello-world
+
+# Démarrer Docker automatiquement au démarrage
+systemctl enable docker
+systemctl enable containerd
