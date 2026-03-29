@@ -1,0 +1,24 @@
+# Redmine configuration file
+# Documentation : https://www.redmine.org/projects/redmine/wiki/RedmineInstall
+
+default:
+  # Encodage des emails
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      enable_starttls_auto: true
+      address: "172.20.255.51"       # Ton serveur iRedMail (si configuré)
+      port: 587
+      domain: "billu.com"
+      authentication: :plain
+      user_name: "redmine@billu.com" # Créer ce compte dans iRedAdmin !
+      password: "Azerty1*"  # Mot de passe du compte mail
+
+  # Stockage des pièces jointes
+  attachments_storage_path: /usr/src/redmine/files
+
+  # Format des dates (français)
+  # date_format: "%d/%m/%Y"
+
+  # Autologin maximum (en jours)
+  autologin: 7
