@@ -1,0 +1,16 @@
+mkdir -p /opt/vaultwarden/nginx/ssl
+cd /opt/vaultwarden/nginx/ssl
+
+
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -keyout vaultwarden.key \
+    -out vaultwarden.crt \
+    -subj "/C=FR/ST=Charente/L=Angouleme/O=Billu/CN=172.20.100.52" \
+    -addext "subjectAltName=IP:172.20.100.52"
+
+# Vérifier que les fichiers sont créés
+ls -la /opt/vaultwarden/nginx/ssl/
+# Tu dois voir : vaultwarden.crt et vaultwarden.key
+
+# Protéger la clé privée
+chmod 600 /opt/vaultwarden/nginx/ssl/vaultwarden.key
