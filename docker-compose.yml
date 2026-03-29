@@ -21,7 +21,7 @@ services:
       - DOMAIN=https://172.20.100.52
 
       # Token d'administration (remplace par TON token généré)
-      - ADMIN_TOKEN=REMPLACE_PAR_TON_TOKEN_ICI
+      - ADMIN_TOKEN=pHUWBGMKCpwRfEQABEOe/Y/XRJO/Lw92zfTblb3SAGk2GBiTqDFQGbPTPQBT2EH7
 
       # Permettre l'inscription de nouveaux comptes
       # true = tout le monde peut s'inscrire (pour le lab)
