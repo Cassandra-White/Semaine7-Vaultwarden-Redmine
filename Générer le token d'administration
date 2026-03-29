@@ -1,0 +1,14 @@
+# Générer un token aléatoire de 48 caractères
+openssl rand -base64 48
+
+# Mémoriser le token dans une variable pour l'utiliser ensuite
+ADMIN_TOKEN=$(openssl rand -base64 48)
+echo "Mon token admin : $ADMIN_TOKEN"
+
+# Hasher le token avec argon2 (si disponible)
+# OU utiliser le token en clair si argon2 n'est pas installé
+apt install argon2 -y 2>/dev/null || echo "argon2 non dispo, on utilisera le token en clair"
+
+cd /opt/vaultwarden
+
+nano docker-compose.yml
